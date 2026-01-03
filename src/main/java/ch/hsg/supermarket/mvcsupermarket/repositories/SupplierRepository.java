@@ -1,7 +1,7 @@
 package ch.hsg.supermarket.mvcsupermarket.repositories;
 
-import org.springframework.stereotype.Repository;
+import ch.hsg.supermarket.mvcsupermarket.domainModel.Supplier;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-@Repository
-public class SupplierRepository {
+public interface SupplierRepository extends JpaRepository<Supplier, Long> {
 }
