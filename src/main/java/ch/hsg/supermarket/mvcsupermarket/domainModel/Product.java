@@ -43,4 +43,8 @@ public class Product {
     public Supplier getSupplier() { return supplier; }
     public List<ProductBatch> getBatches() { return batches; }
     public InventoryItem getInventoryItem() { return inventoryItem; }
+
+    public void setInventoryItem(InventoryItem inventoryItem) {
+        this.inventoryItem = inventoryItem;
+    }
 }

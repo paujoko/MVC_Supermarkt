@@ -51,11 +51,10 @@ public class InventoryService {
                 .sum();
     }
 
-    // BUSINESS LOGIC 4 (Bonus, aber sehr gut)
     public boolean hasExpiredBatches(Product product) {
-        return product.getBatches()
-                .stream()
-                .anyMatch(b -> b.getExpirationDate().isBefore(LocalDate.now()));
+        return productBatchRepository
+                .existsByProductAndExpirationDateBefore(
+                        product, LocalDate.now());
     }
 
     public List<InventoryItem> findAllInventoryItems() {

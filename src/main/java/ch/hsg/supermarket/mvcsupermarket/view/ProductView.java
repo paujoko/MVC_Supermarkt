@@ -11,6 +11,7 @@ import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.Route;
 
 @Route(value = "products", layout = MainView.class)
@@ -25,6 +26,12 @@ public class ProductView extends VerticalLayout {
         ComboBox<Supplier> supplierBox = new ComboBox<>("Supplier");
         supplierBox.setItems(supplierService.findAll());
         supplierBox.setItemLabelGenerator(Supplier::getName);
+
+        /* NEU: Minimum stock Eingabe */
+        IntegerField minimumStock = new IntegerField("Minimum stock");
+
+
+
 
         Button add = new Button("Add product");
 
@@ -51,15 +58,19 @@ public class ProductView extends VerticalLayout {
             productService.createProduct(
                     name.getValue(),
                     price.getValue(),
-                    supplierBox.getValue()
+                    supplierBox.getValue(),
+                    minimumStock.getValue()
             );
+
             grid.setItems(productService.findAll());
             name.clear();
             price.clear();
+            minimumStock.setValue(10);
         });
 
         grid.setItems(productService.findAll());
 
-        add(name, price, supplierBox, add, grid);
+        /* NEU: minimumStock ins Layout aufnehmen */
+        add(name, price, supplierBox, minimumStock, add, grid);
     }
 }

@@ -29,10 +29,11 @@ public class ProductRestController {
     @PostMapping
     public Product createProduct(@RequestParam String name,
                                  @RequestParam double price,
-                                 @RequestParam Long supplierId) {
+                                 @RequestParam Long supplierId,
+                                 @RequestParam int minimunStock) {
 
         Supplier supplier = supplierService.findById(supplierId);
-        return productService.createProduct(name, price, supplier);
+        return productService.createProduct(name, price, supplier,minimunStock);
     }
     @DeleteMapping("/{id}")
     public void deleteProduct(@PathVariable Long id) {

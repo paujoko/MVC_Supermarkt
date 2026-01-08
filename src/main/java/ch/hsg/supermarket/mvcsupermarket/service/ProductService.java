@@ -28,12 +28,19 @@ public class ProductService {
         this.inventoryItemRepository = inventoryItemRepository;
     }
 
-    public Product createProduct(String name, double price, Supplier supplier) {
+    public Product createProduct(String name,
+                                 double price,
+                                 Supplier supplier,
+                                 int minimumStock) {
+
         Product product = new Product(name, price, supplier);
         productRepository.save(product);
 
-        InventoryItem inventoryItem = new InventoryItem(product, 0);
+        InventoryItem inventoryItem =
+                new InventoryItem(product, 0, minimumStock);
+
         inventoryItemRepository.save(inventoryItem);
+        product.setInventoryItem(inventoryItem);
 
         return product;
     }
