@@ -2,8 +2,10 @@ package ch.hsg.supermarket.mvcsupermarket.view;
 
 import ch.hsg.supermarket.mvcsupermarket.domainModel.ProductBatch;
 import ch.hsg.supermarket.mvcsupermarket.service.InventoryService;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 
@@ -15,6 +17,8 @@ public class ProductBatchView extends VerticalLayout
 
     private final InventoryService inventoryService;
     private final Grid<ProductBatch> grid = new Grid<>(ProductBatch.class, false);
+
+    private Long productId;
 
     public ProductBatchView(InventoryService inventoryService) {
         this.inventoryService = inventoryService;
@@ -38,15 +42,26 @@ public class ProductBatchView extends VerticalLayout
             return status;
         }).setHeader("Status");
 
+        grid.addComponentColumn(batch ->
+                new Button("Delete", e -> {
+                    inventoryService.removeBatch(batch.getId());
+                    refreshGrid();
+                    Notification.show("Batch deleted");
+                })
+        ).setHeader("Actions");
+
         add(grid);
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        Long productId = Long.valueOf(
+        productId = Long.valueOf(
                 event.getRouteParameters().get("productId").orElseThrow()
         );
+        refreshGrid();
+    }
 
+    private void refreshGrid() {
         grid.setItems(inventoryService.findBatchesByProductId(productId));
     }
 }
