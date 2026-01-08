@@ -5,6 +5,7 @@ import ch.hsg.supermarket.mvcsupermarket.domainModel.Product;
 import ch.hsg.supermarket.mvcsupermarket.domainModel.ProductBatch;
 import ch.hsg.supermarket.mvcsupermarket.repositories.InventoryItemRepository;
 import ch.hsg.supermarket.mvcsupermarket.repositories.ProductBatchRepository;
+import ch.hsg.supermarket.mvcsupermarket.repositories.ProductRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -15,14 +16,16 @@ public class InventoryService {
 
     private final ProductBatchRepository productBatchRepository;
     private final InventoryItemRepository inventoryItemRepository;
+    private final ProductRepository productRepository;
 
     public InventoryService(ProductBatchRepository productBatchRepository,
-                            InventoryItemRepository inventoryItemRepository) {
+                            InventoryItemRepository inventoryItemRepository,
+                            ProductRepository productRepository) {
         this.productBatchRepository = productBatchRepository;
         this.inventoryItemRepository = inventoryItemRepository;
+        this.productRepository = productRepository;
     }
 
-    // BUSINESS LOGIC 2
     public ProductBatch addBatch(Product product, int quantity, LocalDate expirationDate) {
 
         if (quantity <= 0) {
@@ -38,23 +41,27 @@ public class InventoryService {
 
         return batch;
     }
+
     public void removeBatch(Long batchId) {
-        productBatchRepository.deleteById(batchId);
+
+        ProductBatch batch = productBatchRepository.findById(batchId)
+                .orElseThrow();
+
+        Product product = batch.getProduct();
+        InventoryItem inventoryItem = product.getInventoryItem();
+
+        inventoryItem.updateQuantity(
+                inventoryItem.getTotalQuantity() - batch.getQuantity()
+        );
+
+        inventoryItemRepository.save(inventoryItem);
+        productBatchRepository.delete(batch);
     }
 
-
-    // BUSINESS LOGIC 3
-    public int calculateTotalStock(Product product) {
-        return product.getBatches()
-                .stream()
-                .mapToInt(ProductBatch::getQuantity)
-                .sum();
-    }
-
-    public boolean hasExpiredBatches(Product product) {
-        return productBatchRepository
-                .existsByProductAndExpirationDateBefore(
-                        product, LocalDate.now());
+    public List<ProductBatch> findBatchesByProductId(Long productId) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow();
+        return productBatchRepository.findByProduct(product);
     }
 
     public List<InventoryItem> findAllInventoryItems() {

@@ -4,6 +4,7 @@ import ch.hsg.supermarket.mvcsupermarket.domainModel.InventoryItem;
 import ch.hsg.supermarket.mvcsupermarket.domainModel.Product;
 import ch.hsg.supermarket.mvcsupermarket.service.InventoryService;
 import ch.hsg.supermarket.mvcsupermarket.service.ProductService;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
@@ -34,7 +35,6 @@ public class InventoryView extends VerticalLayout {
 
         grid.addComponentColumn(item -> {
             Span status = new Span();
-
             if (item.isLowOnStock()) {
                 status.setText("LOW STOCK");
                 status.getStyle().set("color", "red");
@@ -43,26 +43,15 @@ public class InventoryView extends VerticalLayout {
                 status.setText("OK");
                 status.getStyle().set("color", "green");
             }
-
             return status;
-        }).setHeader("Stock Status");
+        }).setHeader("Stock status");
 
-        grid.addComponentColumn(item -> {
-            Span expired = new Span();
-
-            boolean hasExpired = inventoryService.hasExpiredBatches(item.getProduct());
-
-            if (hasExpired) {
-                expired.setText("EXPIRED");
-                expired.getStyle().set("color", "red");
-                expired.getStyle().set("font-weight", "bold");
-            } else {
-                expired.setText("OK");
-                expired.getStyle().set("color", "green");
-            }
-
-            return expired;
-        }).setHeader("Expired");
+        grid.addComponentColumn(item ->
+                new Button("View batches", e ->
+                        UI.getCurrent().getPage()
+                                .open("batches/" + item.getProduct().getId())
+                )
+        ).setHeader("Details");
 
         addBatch.addClickListener(e -> {
             inventoryService.addBatch(
